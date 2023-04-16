@@ -1,11 +1,5 @@
 import { CloseOutlined } from "@mui/icons-material";
-import {
-  Button,
-  IconButton,
-  Stack,
-  Typography,
-  useTheme
-} from "@mui/material";
+import { Button, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
 import uploadImg from "../../assets/cloud-upload-regular-240.png";
@@ -40,6 +34,18 @@ const DropFileInput = (props) => {
   useEffect(() => {
     props.onFileChange(file);
   }, [file]);
+
+  const returnSize = (file) => {
+    const fileSizeInBytes = file.size; // Example file size in bytes
+    let fileSize;
+
+    if (fileSizeInBytes >= 1048576) {
+      fileSize = (fileSizeInBytes / 1048576).toFixed(2) + " MB";
+    } else {
+      fileSize = (fileSizeInBytes / 1024).toFixed(2) + " KB";
+    }
+    return fileSize;
+  };
 
   return (
     <>
@@ -107,7 +113,7 @@ const DropFileInput = (props) => {
             <img src={filePdf} alt="PDF Icon" />
             <div className="drop-file-preview__item__info">
               <p>{file.name}</p>
-              <p>{file.size}B</p>
+              <p>{returnSize(file)}</p>
             </div>
             <IconButton onClick={fileRemove}>
               <CloseOutlined />

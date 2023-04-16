@@ -9,7 +9,7 @@ export default function PdfUploader() {
   const [pdfFile, setPdfFile] = useState(null);
 
   return (
-    <div style={{ height: "100vh" }}>
+    <div style={{ height: "100dvh" }}>
       <Grid container className="d-flex" sx={{ py: 6, px: 4 }}>
         <Grid item className="box">
           <DropFileInput onFileChange={(file) => setPdfFile(file)} />

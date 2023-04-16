@@ -1,5 +1,13 @@
 import { CloseOutlined } from "@mui/icons-material";
-import { Button, IconButton, Stack, Typography, useTheme } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  Snackbar,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
 import uploadImg from "../../assets/cloud-upload-regular-240.png";
@@ -7,12 +15,24 @@ import filePdf from "../../assets/file-pdf-solid-240.png";
 import { primary } from "../PdfUploader";
 import "./drop-file-input.css";
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const DropFileInput = (props) => {
   const theme = useTheme();
   const wrapperRef = useRef(null);
   const bpSMd = theme.breakpoints.down("sm");
 
   const [file, setFile] = useState(null);
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
 
   const onDragEnter = () => wrapperRef.current.classList.add("dragover");
 
@@ -22,8 +42,11 @@ const DropFileInput = (props) => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-    if (newFile) {
+    console.log(newFile);
+    if (newFile && newFile.type === "application/pdf") {
       setFile(newFile);
+    } else {
+      setOpen(true);
     }
   };
 
@@ -98,12 +121,7 @@ const DropFileInput = (props) => {
             <img src={uploadImg} alt="" />
             <p>Drag & Drop your files here</p>
           </div>
-          <input
-            type="file"
-            accept=".pdf"
-            value=""
-            onChange={onFileDrop}
-          />
+          <input type="file" accept=".pdf" value="" onChange={onFileDrop} />
         </Button>
       )}
       {file ? (
@@ -121,6 +139,19 @@ const DropFileInput = (props) => {
           </div>
         </div>
       ) : null}
+      <Snackbar
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={open}
+        autoHideDuration={4000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          Please upload pdf only
+        </Alert>
+      </Snackbar>
     </>
   );
 };

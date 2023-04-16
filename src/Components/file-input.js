@@ -10,22 +10,25 @@ import {
 import MuiAlert from "@mui/material/Alert";
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
-import uploadImg from "../../assets/cloud-upload-regular-240.png";
-import filePdf from "../../assets/file-pdf-solid-240.png";
-import { primary } from "../PdfUploader";
-import "./drop-file-input.css";
+import uploadImg from "../assets/cloud-upload-regular-240.png";
+import filePdf from "../assets/file-pdf-solid-240.png";
+import { primary } from "../App";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const DropFileInput = (props) => {
+const FileInput = (props) => {
   const theme = useTheme();
   const wrapperRef = useRef(null);
   const bpSMd = theme.breakpoints.down("sm");
 
   const [file, setFile] = useState(null);
   const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    props.onFileChange(file);
+  }, [file]);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -42,21 +45,12 @@ const DropFileInput = (props) => {
 
   const onFileDrop = (e) => {
     const newFile = e.target.files[0];
-    console.log(newFile);
     if (newFile && newFile.type === "application/pdf") {
       setFile(newFile);
     } else {
       setOpen(true);
     }
   };
-
-  const fileRemove = () => {
-    setFile(null);
-  };
-
-  useEffect(() => {
-    props.onFileChange(file);
-  }, [file]);
 
   const returnSize = (file) => {
     const fileSizeInBytes = file.size; // Example file size in bytes
@@ -80,7 +74,6 @@ const DropFileInput = (props) => {
         sx={{ marginBottom: 3 }}
       >
         <Typography
-          // gutterBottom
           variant="h1"
           sx={{
             fontSize: "40px",
@@ -94,7 +87,6 @@ const DropFileInput = (props) => {
           PDF
         </Typography>
         <Typography
-          // gutterBottom
           variant="h1"
           sx={{
             fontSize: "40px",
@@ -110,7 +102,6 @@ const DropFileInput = (props) => {
       </Stack>
       {!file && (
         <Button
-          // component="label"
           ref={wrapperRef}
           className="drop-file-input"
           onDragEnter={onDragEnter}
@@ -133,7 +124,7 @@ const DropFileInput = (props) => {
               <p>{file.name}</p>
               <p>{returnSize(file)}</p>
             </div>
-            <IconButton onClick={fileRemove}>
+            <IconButton onClick={()=>setFile(null)}>
               <CloseOutlined />
             </IconButton>
           </div>
@@ -156,8 +147,8 @@ const DropFileInput = (props) => {
   );
 };
 
-DropFileInput.propTypes = {
+FileInput.propTypes = {
   onFileChange: PropTypes.func,
 };
 
-export default DropFileInput;
+export default FileInput;

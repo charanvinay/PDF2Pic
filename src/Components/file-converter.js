@@ -15,7 +15,7 @@ import React, { useEffect, useMemo, useState } from "react";
 var pdfjsLib = window["pdfjs-dist/build/pdf"];
 pdfjsLib.GlobalWorkerOptions.workerSrc = "./assets/js/pdf.worker.js";
 
-function PdfToImageConverter({ pdfUrl, fileName }) {
+function FileConverter({ pdfUrl, fileName }) {
   const myRef = React.createRef();
 
   const [open, setOpen] = useState(false);
@@ -38,14 +38,13 @@ function PdfToImageConverter({ pdfUrl, fileName }) {
     setOpen(false);
   };
 
-  const UrlUploader = (url, for_whatsapp) => {
+  const UrlUploader = (url) => {
     fetch(url).then((response) => {
       response.blob().then((blob) => {
         let reader = new FileReader();
         reader.onload = (e) => {
           const data = atob(e.target.result.replace(/.*base64,/, ""));
-          returnPageCount(data);
-          renderPage(data, for_whatsapp);
+          renderPage(data);
         };
         reader.readAsDataURL(blob);
       });
@@ -56,20 +55,11 @@ function PdfToImageConverter({ pdfUrl, fileName }) {
     UrlUploader(pdfUrl);
   }, []);
 
-  const returnPageCount = async (data) => {
-    var pdfjsLib = window["pdfjs-dist/build/pdf"];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "./assets/js/pdf.worker.js";
-    const pdf = await pdfjsLib.getDocument({ data }).promise;
-    setNumOfPages((e) => e + pdf.numPages);
-  };
-
   const renderPage = async (data) => {
     setLoading(true);
     const imagesList = [];
     const canvas = document.createElement("canvas");
     canvas.setAttribute("className", "canv");
-    var pdfjsLib = window["pdfjs-dist/build/pdf"];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "./assets/js/pdf.worker.js";
     const pdf = await pdfjsLib.getDocument({ data }).promise;
     for (let i = 1; i <= pdf.numPages; i++) {
       var page = await pdf.getPage(i);
@@ -84,11 +74,11 @@ function PdfToImageConverter({ pdfUrl, fileName }) {
       let img = canvas.toDataURL("image/png");
       imagesList.push(img);
     }
+    setNumOfPages((e) => e + pdf.numPages);
     setImageUrls((e) => [...e, ...imagesList]);
   };
 
   useEffect(() => {
-    // console.log(myRef);
     myRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [imageUrls]);
 
@@ -111,7 +101,7 @@ function PdfToImageConverter({ pdfUrl, fileName }) {
           {imageUrls.length > 0 && (
             <>
               <h4 className="drop-file-preview__title">
-                Converted Image - {numOfPages}
+                Converted Images - {numOfPages}
               </h4>
               <Grid container spacing={3}>
                 {imageUrls.map((url, index) => (
@@ -192,4 +182,4 @@ function PdfToImageConverter({ pdfUrl, fileName }) {
   );
 }
 
-export default PdfToImageConverter;
+export default FileConverter;

@@ -100,7 +100,7 @@ const DropFileInput = (props) => {
           </div>
           <input
             type="file"
-            accept="application/pdf"
+            accept=".pdf"
             value=""
             onChange={onFileDrop}
           />
